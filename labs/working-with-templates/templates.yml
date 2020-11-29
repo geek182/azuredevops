@@ -1,0 +1,12 @@
+parameters:
+- name: echoValue
+  default: "this is the default value"
+  type: string
+
+
+jobs:
+- job: EchoValue
+  pool:
+    vmImage: 'ubuntu-16.04'
+  steps:
+  - bash: echo ${{ parameters.echoValue }}
