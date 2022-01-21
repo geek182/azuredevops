@@ -1,0 +1,53 @@
+trigger: none
+
+parameters:
+  - name: environment
+    displayName: 'Deploy'
+    type: string
+    default: 'tst'
+    values:
+      - tst
+      - acc
+      - prd
+
+stages:
+  - stage: deploy
+    displayName: Deploy job resource for ${{ parameters.environment }}
+    jobs:
+      - job: CreateVariable
+        displayName: "Creating a variable"
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - task: Bash@3
+            displayName: 'Setting up variables'
+            condition: succeeded()
+            name: step1
+            inputs:
+              targetType: 'inline'
+              script: |
+                StaticValue="value0 value1 value2"
+                dateNow=$(date)
+                echo "##vso[task.setvariable variable=DASHBOARDS;isOutput=true]$StaticValue" 
+                echo "##vso[task.setvariable variable=betweenTasks]$dateNow"
+          - task: Bash@3
+            displayName: 'Collecting value from last task'
+            name: step2
+            inputs:
+              targetType: 'inline'
+              script: |
+                echo "This value was setup on a previous task: $(betweenTasks)"
+
+      - job: ConsumeVariable
+        dependsOn: CreateVariable
+        displayName: "Consuming a variable from previous Job"
+        pool:
+          vmImage: 'ubuntu-latest'
+        variables:
+          varFromA: $[ dependencies.CreateVariable.outputs['step1.DASHBOARDS']]
+        steps:
+          - script: echo $(varFromA) #it works too
+          # How to pass this variable to a template?
+          - template: loopTemplate.yml
+            parameters:
+              date:  $(varFromA)

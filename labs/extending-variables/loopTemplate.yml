@@ -1,0 +1,24 @@
+parameters:
+  date: []
+
+steps:
+  - task: Bash@3
+    name: loop
+    inputs:
+      targetType: 'inline'
+      script: |
+        echo ${{ parameters.date }}
+
+  - script: echo $(varFromA) #it has access
+
+
+# Here I tried to create a task based on a variable received in a previous job.
+# it doesnt work -> https://stackoverflow.com/questions/62135666/loop-through-dynamic-template-parameters-in-azure-devops-yaml
+#steps:
+#- ${{ each file in parameters.date }}:
+#  - task: Bash@3
+#    name: loop
+#    inputs:
+#      targetType: 'inline'
+#      script: |
+#          echo ${{ file }}
