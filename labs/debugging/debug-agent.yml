@@ -1,0 +1,7 @@
+steps:
+- task: Bash@3
+  inputs:
+    targetType: 'inline'
+    script: |
+        echo started by $(Build.QueuedBy)
+        echo repository name $(Build.Repository.Name)
